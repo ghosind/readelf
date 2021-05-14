@@ -185,14 +185,14 @@ typedef struct {
 #define EM_LATTINCEMICO32 138
 #define EM_SE_C17 139
 #define EM_TI_C6000 140
-#define EM_TI_C200 141
+#define EM_TI_C2000 141
 #define EM_TI_C5500 142
 #define EM_TI_ARP32 143
 #define EM_TI_PRU 144
 #define EM_MMDSP_PLUS 160
 #define EM_CYPRESS_M8C 161
 #define EM_R32C 162
-#define EM_TRIMDIA 163
+#define EM_TRIMEDIA 163
 #define EM_QDSP6 164
 #define EM_8051 165
 #define EM_STXP7X 166
