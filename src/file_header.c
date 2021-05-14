@@ -292,4 +292,23 @@ void display_file_header(const unsigned char *buf) {
   fprintf(stdout,
     "  Start of section headers:          %llu (bytes into file)\n",
     header->e_shoff);
+  // flags
+  fprintf(stdout,
+    "  Size of this header:               %d (bytes)\n",
+    header->e_ehsize);
+  fprintf(stdout,
+    "  Size of program headers:           %d (bytes)\n",
+    header->e_phentsize);
+  fprintf(stdout,
+    "  Number of program headers:         %d\n",
+    header->e_phnum);
+    fprintf(stdout,
+    "  Size of section headers:           %d (bytes)\n",
+    header->e_shentsize);
+    fprintf(stdout,
+    "  Number of section headers:         %d\n",
+    header->e_shnum);
+    fprintf(stdout,
+    "  Section header string table index: %d\n",
+    header->e_shstrndx);
 }
