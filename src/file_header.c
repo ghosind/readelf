@@ -292,7 +292,10 @@ void display_file_header(const unsigned char *buf) {
   fprintf(stdout,
     "  Start of section headers:          %llu (bytes into file)\n",
     header->e_shoff);
-  // flags
+  // TODO: machine specific flags.
+  fprintf(stdout,
+    "  Flags:                             0x%x\n",
+    header->e_flags);
   fprintf(stdout,
     "  Size of this header:               %d (bytes)\n",
     header->e_ehsize);
