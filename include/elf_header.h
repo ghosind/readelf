@@ -261,4 +261,6 @@ typedef struct {
 #define EV_NONE     0
 #define EV_CURRENT  1
 
+Elf_Internal_Ehdr *get_elf_header(const unsigned char *);
+
 #endif // ELF_HEADER_H

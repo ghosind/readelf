@@ -11,6 +11,7 @@ void print_usage(void) {
   fprintf(stdout, " Options are:\n");
   fprintf(stdout, "  -a                     Equivalent to: -h\n");
   fprintf(stdout, "  -h                     Display the ELF file header\n");
+  fprintf(stdout, "  -S                     Display the sections' header\n");
 }
 
 int parse_options_flags(int argc, char *argv[]) {
@@ -30,9 +31,13 @@ int parse_options_flags(int argc, char *argv[]) {
     switch (argv[i][1]) {
     case 'a':
       flags |= FLAG_ELF_HEADER;
+      flags |= FLAG_SECTION_HEADER;
       break;
     case 'h':
       flags |= FLAG_ELF_HEADER;
+      break;
+    case 'S':
+      flags |= FLAG_SECTION_HEADER;
       break;
     default:
       fprintf(stderr, "readelf: invalid option %s\n", argv[i]);
@@ -49,6 +54,10 @@ void read_elf_data(const char *path, int flags) {
 
   if (flags & FLAG_ELF_HEADER) {
     display_file_header(buf);
+  }
+
+  if (flags & FLAG_SECTION_HEADER) {
+    display_section_header(buf);
   }
 
   free(buf);
