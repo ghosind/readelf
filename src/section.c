@@ -163,7 +163,7 @@ void display_section_header(const unsigned char *buf) {
     Elf_Internal_Shdr *shdr = get_section_header(buf, elf_header, i);
 
     // section No.
-    fprintf(stdout, "  [%2u]", i);
+    fprintf(stdout, "  [%2d]", i);
     // TODO: section name.
     fprintf(stdout, " %-17s", "");
     // section type

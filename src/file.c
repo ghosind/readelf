@@ -28,7 +28,7 @@ void *read_file(const char *filename) {
   }
 
   off_t size = get_file_size(fd);
-  void *buf = malloc(size);
+  void *buf = malloc(size + 1);
   if (read(fd, buf, size) != size) {
     perror("readelf");
     exit(errno);
