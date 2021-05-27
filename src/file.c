@@ -35,6 +35,7 @@ void *read_file(const char *filename) {
   }
 
   close(fd);
+  errno = errno_save;
 
   return buf;
 }
