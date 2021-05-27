@@ -14,11 +14,12 @@ void print_usage(void) {
   fprintf(stdout, "  -S                     Display the sections' header\n");
 }
 
-int parse_options_flags(int argc, char *argv[]) {
+int parse_options_flags(int argc, char *argv[], int *fileno) {
   int flags = 0;
 
   for (int i = 1; i < argc; i++) {
     if (argv[i][0] != '-') {
+      (*fileno)++;
       continue;
     }
 
@@ -69,13 +70,17 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  int flags = parse_options_flags(argc, argv);
+  int fileno = 0;
+  int flags = parse_options_flags(argc, argv, &fileno);
 
   for (int i = 1; i < argc; i++) {
     if (argv[i][0] == '-') {
       continue;
     }
 
+    if (fileno > 1) {
+      fprintf(stdout, "\nFile: %s\n", argv[i]);
+    }
     read_elf_data(argv[i], flags);
   }
 
