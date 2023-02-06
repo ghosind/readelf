@@ -1,3 +1,4 @@
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -16,20 +17,10 @@ void print_usage(void) {
 
 int parse_options_flags(int argc, char *argv[], int *fileno) {
   int flags = 0;
+  int opt;
 
-  for (int i = 1; i < argc; i++) {
-    if (argv[i][0] != '-') {
-      (*fileno)++;
-      continue;
-    }
-
-    if (argv[i][2] != '\0') {
-      fprintf(stderr, "readelf: invalid option %s\n", argv[i]);
-      print_usage();
-      exit(1);
-    }
-
-    switch (argv[i][1]) {
+  while ((opt = getopt(argc, argv, "ahS")) != -1) {
+    switch (opt) {
     case 'a':
       flags |= FLAG_ELF_HEADER;
       flags |= FLAG_SECTION_HEADER;
@@ -41,7 +32,6 @@ int parse_options_flags(int argc, char *argv[], int *fileno) {
       flags |= FLAG_SECTION_HEADER;
       break;
     default:
-      fprintf(stderr, "readelf: invalid option %s\n", argv[i]);
       print_usage();
       exit(1);
     }
