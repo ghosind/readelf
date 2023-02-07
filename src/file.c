@@ -15,6 +15,7 @@ off_t get_file_size(int fd) {
   }
 
   errno = errno_save;
+
   return buf.st_size;
 }
 
@@ -27,9 +28,12 @@ void *read_file(const char *filename) {
     exit(errno);
   }
 
+  // TODO: read header only
+
   off_t size = get_file_size(fd);
   void *buf = malloc(size + 1);
-  if (read(fd, buf, size) != size) {
+  int ret = read(fd, buf, size);
+  if (ret < 0) {
     perror("readelf");
     exit(errno);
   }
