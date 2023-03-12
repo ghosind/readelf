@@ -2,44 +2,41 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
-off_t get_file_size(int fd) {
-  struct stat buf;
-  int errno_save = errno;
-
-  if (fstat(fd, &buf) == -1) {
+FILE *open_file(const char *filename) {
+  FILE *file = fopen(filename, O_RDONLY);
+  if (!file) {
     perror("readelf");
     exit(errno);
   }
 
-  errno = errno_save;
-
-  return buf.st_size;
+  return file;
 }
 
-void *read_file(const char *filename) {
-  int errno_save = errno;
-
-  int fd = open(filename, O_RDONLY);
-  if (fd == -1) {
+void *read_file(FILE *file, size_t size, off_t offset) {
+  void *buf = malloc(size);
+  if (!buf) {
     perror("readelf");
     exit(errno);
   }
 
-  // TODO: read header only
-
-  off_t size = get_file_size(fd);
-  void *buf = malloc(size + 1);
-  int ret = read(fd, buf, size);
-  if (ret < 0) {
+  off_t off = fseek(file, offset, SEEK_SET);
+  if (off == -1) {
     perror("readelf");
     exit(errno);
   }
 
-  close(fd);
-  errno = errno_save;
+  int n = fread(buf, size, 1, file);
+  if (n == size) {
+    return buf;
+  }
 
-  return buf;
+  if (n < 0) {
+    perror("readelf");
+  } else {
+    fprintf(stderr, "readelf: Error: Not a valid ELF file\n");
+  }
+
+  free(buf);
+  exit(errno);
 }

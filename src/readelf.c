@@ -3,8 +3,10 @@
 #include <stdlib.h>
 
 #include "elf.h"
+#include "elf_header.h"
 #include "file.h"
 #include "readelf.h"
+#include "section.h"
 
 void print_usage(void) {
   fprintf(stdout, "Usage: readelf <option(s)> elf-file\n");
@@ -41,17 +43,18 @@ int parse_options_flags(int argc, char *argv[], int *fileno) {
 }
 
 void read_elf_data(const char *path, int flags) {
-  unsigned char *buf = (unsigned char *) read_file(path);
+  FILE *file = open_file(path);
+  Elf_Internal_Ehdr *header = get_elf_header(file);
 
   if (flags & FLAG_ELF_HEADER) {
-    display_file_header(buf);
+    display_file_header(header);
   }
 
   if (flags & FLAG_SECTION_HEADER) {
-    display_section_header(buf);
+    display_section_header(file, header);
   }
 
-  free(buf);
+  fclose(file);
 }
 
 int main(int argc, char *argv[]) {

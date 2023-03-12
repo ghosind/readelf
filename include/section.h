@@ -86,4 +86,6 @@ typedef struct {
 #define SHF_MASKOS	          0x0ff00000
 #define SHF_MASKPROC	        0xf0000000
 
+void display_section_header(FILE *, Elf_Internal_Ehdr *);
+
 #endif // SECTION_H

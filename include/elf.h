@@ -19,7 +19,4 @@ typedef int64_t  Elf64_Sxword;
 
 int check_elf_magic_num(const unsigned char *);
 
-void display_file_header(const unsigned char *);
-void display_section_header(const unsigned char *);
-
 #endif // ELF_H

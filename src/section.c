@@ -1,45 +1,58 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "elf_header.h"
+#include "file.h"
 #include "section.h"
 
-Elf_Internal_Shdr *get_section_header(const unsigned char *buf,
+Elf_Internal_Shdr **get_section_headers(FILE *file,
     Elf_Internal_Ehdr *elf_header,
-    int index) {
-  static Elf_Internal_Shdr header;
-
-  if (elf_header->e_ident[EI_CLASS] == ELFCLASS64) {
-    Elf64_Shdr *shdr =
-      (Elf64_Shdr *)(buf + elf_header->e_shoff + sizeof(Elf64_Shdr) * index);
-
-    header.sh_name = shdr->sh_name;
-    header.sh_type = shdr->sh_type;
-    header.sh_flags = shdr->sh_flags;
-    header.sh_addr = shdr->sh_addr;
-    header.sh_offset = shdr->sh_offset;
-    header.sh_size = shdr->sh_size;
-    header.sh_link = shdr->sh_link;
-    header.sh_info = shdr->sh_info;
-    header.sh_addralign = shdr->sh_addralign;
-    header.sh_entsize = shdr->sh_entsize;
-  } else {
-    Elf32_Shdr *shdr =
-      (Elf32_Shdr *)(buf + elf_header->e_shoff + sizeof(Elf32_Shdr) * index);
-
-    header.sh_name = shdr->sh_name;
-    header.sh_type = shdr->sh_type;
-    header.sh_flags = shdr->sh_flags;
-    header.sh_addr = shdr->sh_addr;
-    header.sh_offset = shdr->sh_offset;
-    header.sh_size = shdr->sh_size;
-    header.sh_link = shdr->sh_link;
-    header.sh_info = shdr->sh_info;
-    header.sh_addralign = shdr->sh_addralign;
-    header.sh_entsize = shdr->sh_entsize;
+    int shnum
+) {
+  off_t offset = elf_header->e_shoff;
+  void *buf = read_file(file, sizeof(Elf64_Shdr) * shnum, offset);
+  Elf_Internal_Shdr **headers = malloc(sizeof(Elf_Internal_Shdr) * shnum);
+  if (!headers) {
+    perror("readelf");
+    exit(errno);
   }
 
-  return &header;
+  if (elf_header->e_ident[EI_CLASS] == ELFCLASS64) {
+    for (int i = 0; i < shnum; i++) {
+      Elf64_Shdr *shdr = (Elf64_Shdr *) buf + sizeof(Elf64_Shdr) * i;
+
+      headers[i]->sh_name = shdr->sh_name;
+      headers[i]->sh_type = shdr->sh_type;
+      headers[i]->sh_flags = shdr->sh_flags;
+      headers[i]->sh_addr = shdr->sh_addr;
+      headers[i]->sh_offset = shdr->sh_offset;
+      headers[i]->sh_size = shdr->sh_size;
+      headers[i]->sh_link = shdr->sh_link;
+      headers[i]->sh_info = shdr->sh_info;
+      headers[i]->sh_addralign = shdr->sh_addralign;
+      headers[i]->sh_entsize = shdr->sh_entsize;
+    }
+  } else {
+    for (int i = 0; i < shnum; i++) {
+      Elf32_Shdr *shdr = (Elf32_Shdr *) buf + sizeof(Elf32_Shdr) * i;
+
+      headers[i]->sh_name = shdr->sh_name;
+      headers[i]->sh_type = shdr->sh_type;
+      headers[i]->sh_flags = shdr->sh_flags;
+      headers[i]->sh_addr = shdr->sh_addr;
+      headers[i]->sh_offset = shdr->sh_offset;
+      headers[i]->sh_size = shdr->sh_size;
+      headers[i]->sh_link = shdr->sh_link;
+      headers[i]->sh_info = shdr->sh_info;
+      headers[i]->sh_addralign = shdr->sh_addralign;
+      headers[i]->sh_entsize = shdr->sh_entsize;
+    }
+  }
+
+  free(buf);
+
+  return headers;
 }
 
 char *get_section_type(uint32_t sh_type) {
@@ -141,9 +154,7 @@ char *get_section_flags(const uint64_t sh_flags) {
   return buf;
 }
 
-void display_section_header(const unsigned char *buf) {
-  Elf_Internal_Ehdr *elf_header = get_elf_header(buf);
-
+void display_section_header(FILE *file, Elf_Internal_Ehdr *elf_header) {
   if (check_elf_magic_num(elf_header->e_ident)) {
     fprintf(stderr,
         "readelf: Error: Not an ELF file - it has wrong magic bytes at the starts\n");
@@ -159,8 +170,10 @@ void display_section_header(const unsigned char *buf) {
   fprintf(stdout,
       "  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al\n");
 
+  Elf_Internal_Shdr **shdrs = get_section_headers(file, elf_header, elf_header->e_shnum);
+
   for (int i = 0; i < elf_header->e_shnum; i++) {
-    Elf_Internal_Shdr *shdr = get_section_header(buf, elf_header, i);
+    Elf_Internal_Shdr *shdr = shdrs[i];
 
     // section No.
     fprintf(stdout, "  [%2d]", i);

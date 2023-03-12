@@ -1,52 +1,62 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "elf.h"
 #include "elf_header.h"
 #include "elf_ident.h"
+#include "file.h"
 
-Elf_Internal_Ehdr *get_elf_header(const unsigned char *buf) {
-  static Elf_Internal_Ehdr header;
+Elf_Internal_Ehdr *get_elf_header(FILE *file) {
+  char *buf = (char *) read_file(file, sizeof(Elf64_Ehdr), 0);
+  Elf_Internal_Ehdr *header = (Elf_Internal_Ehdr *) malloc(sizeof(Elf_Internal_Ehdr));
+  if (!header) {
+    perror("readelf");
+    free(buf);
+    exit(errno);
+  }
 
   for (int i = 0; i < EI_NIDENT; i++) {
-    header.e_ident[i] = buf[i];
+    header->e_ident[i] = buf[i];
   }
 
   if (buf[EI_CLASS] == ELFCLASS64) {
     Elf64_Ehdr *elf64 = (Elf64_Ehdr *) buf;
 
-    header.e_type = elf64->e_type;
-    header.e_machine = elf64->e_machine;
-    header.e_version = elf64->e_version;
-    header.e_entry = elf64->e_entry;
-    header.e_phoff = elf64->e_phoff;
-    header.e_shoff = elf64->e_shoff;
-    header.e_flags = elf64->e_flags;
-    header.e_ehsize = elf64->e_ehsize;
-    header.e_phentsize = elf64->e_phentsize;
-    header.e_phnum = elf64->e_phnum;
-    header.e_shentsize = elf64->e_shentsize;
-    header.e_shnum = elf64->e_shnum;
-    header.e_shstrndx = elf64->e_shstrndx;
+    header->e_type = elf64->e_type;
+    header->e_machine = elf64->e_machine;
+    header->e_version = elf64->e_version;
+    header->e_entry = elf64->e_entry;
+    header->e_phoff = elf64->e_phoff;
+    header->e_shoff = elf64->e_shoff;
+    header->e_flags = elf64->e_flags;
+    header->e_ehsize = elf64->e_ehsize;
+    header->e_phentsize = elf64->e_phentsize;
+    header->e_phnum = elf64->e_phnum;
+    header->e_shentsize = elf64->e_shentsize;
+    header->e_shnum = elf64->e_shnum;
+    header->e_shstrndx = elf64->e_shstrndx;
   } else {
     Elf32_Ehdr *elf32 = (Elf32_Ehdr *) buf;
 
-    header.e_type = elf32->e_type;
-    header.e_machine = elf32->e_machine;
-    header.e_version = elf32->e_version;
-    header.e_entry = elf32->e_entry;
-    header.e_phoff = elf32->e_phoff;
-    header.e_shoff = elf32->e_shoff;
-    header.e_flags = elf32->e_flags;
-    header.e_ehsize = elf32->e_ehsize;
-    header.e_phentsize = elf32->e_phentsize;
-    header.e_phnum = elf32->e_phnum;
-    header.e_shentsize = elf32->e_shentsize;
-    header.e_shnum = elf32->e_shnum;
-    header.e_shstrndx = elf32->e_shstrndx;
+    header->e_type = elf32->e_type;
+    header->e_machine = elf32->e_machine;
+    header->e_version = elf32->e_version;
+    header->e_entry = elf32->e_entry;
+    header->e_phoff = elf32->e_phoff;
+    header->e_shoff = elf32->e_shoff;
+    header->e_flags = elf32->e_flags;
+    header->e_ehsize = elf32->e_ehsize;
+    header->e_phentsize = elf32->e_phentsize;
+    header->e_phnum = elf32->e_phnum;
+    header->e_shentsize = elf32->e_shentsize;
+    header->e_shnum = elf32->e_shnum;
+    header->e_shstrndx = elf32->e_shstrndx;
   }
 
-  return &header;
+  free(buf);
+
+  return header;
 }
 
 void print_magic(const unsigned char *e_ident) {
@@ -248,9 +258,7 @@ char *get_machine_name(uint16_t e_machine) {
   return buf;
 }
 
-void display_file_header(const unsigned char *buf) {
-  Elf_Internal_Ehdr *header = get_elf_header(buf);
-
+void display_file_header(const Elf_Internal_Ehdr *header) {
   if (check_elf_magic_num(header->e_ident)) {
     fprintf(stderr,
       "readelf: Error: Not an ELF file - it has wrong magic bytes at the starts\n");

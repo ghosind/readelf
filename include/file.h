@@ -1,6 +1,8 @@
 #ifndef FILE_H
 #define FILE_H
 
-void *read_file(const char *);
+FILE *open_file(const char *);
+
+void *read_file(FILE *, size_t, off_t);
 
 #endif // FILE_H
