@@ -54,3 +54,9 @@ dkms.conf
 # Objects
 bin
 obj
+
+# Editors
+.vscode
+
+# Misc
+.DS_Store
