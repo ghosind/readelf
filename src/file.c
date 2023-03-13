@@ -1,10 +1,9 @@
 #include <errno.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 FILE *open_file(const char *filename) {
-  FILE *file = fopen(filename, O_RDONLY);
+  FILE *file = fopen(filename, "r");
   if (!file) {
     perror("readelf");
     exit(errno);
@@ -27,7 +26,7 @@ void *read_file(FILE *file, size_t size, off_t offset) {
   }
 
   int n = fread(buf, size, 1, file);
-  if (n == size) {
+  if (n == 1) {
     return buf;
   }
 
