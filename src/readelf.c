@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,7 +55,12 @@ void read_elf_data(const char *path, int flags) {
     display_section_header(file, header);
   }
 
-  fclose(file);
+  free(header);
+
+  if (fclose(file)) {
+    perror("readelf");
+    exit(errno);
+  }
 }
 
 int main(int argc, char *argv[]) {

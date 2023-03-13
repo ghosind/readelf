@@ -214,4 +214,6 @@ void display_section_header(FILE *file, Elf_Internal_Ehdr *elf_header) {
       "  L (link order), O (extra OS processing required), G (group), T (TLS),\n");
   fprintf(stdout,
       "  C (compressed)\n");
+
+  free(shdrs);
 }
