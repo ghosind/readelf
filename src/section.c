@@ -5,6 +5,7 @@
 #include "elf_header.h"
 #include "file.h"
 #include "section.h"
+#include "string_table.h"
 
 Elf_Internal_Shdr **get_section_headers(FILE *file,
     Elf_Internal_Ehdr *elf_header,
@@ -178,13 +179,15 @@ void display_section_header(FILE *file, Elf_Internal_Ehdr *elf_header) {
       elf_header->e_shnum,
       elf_header->e_ident[EI_CLASS] == ELFCLASS64);
 
+  char *strtab = load_string_table(file, elf_header, shdrs);
+
   for (int i = 0; i < elf_header->e_shnum; i++) {
     Elf_Internal_Shdr *shdr = (Elf_Internal_Shdr *) shdrs + i;
 
     // section No.
     fprintf(stdout, "  [%2d]", i);
     // TODO: section name.
-    fprintf(stdout, " %-17s", "");
+    fprintf(stdout, " %-17s", get_str_by_index(strtab, shdr->sh_name));
     // section type
     fprintf(stdout, " %-15s", get_section_type(shdr->sh_type));
     // section address
@@ -216,4 +219,5 @@ void display_section_header(FILE *file, Elf_Internal_Ehdr *elf_header) {
       "  C (compressed)\n");
 
   free(shdrs);
+  free(strtab);
 }
