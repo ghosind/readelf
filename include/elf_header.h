@@ -39,19 +39,33 @@ typedef struct {
 } Elf64_Ehdr;
 
 typedef struct {
+  // ELF identification
   unsigned char   e_ident[EI_NIDENT];
+  // object file type
   uint16_t        e_type;
+  // architecture
   uint16_t        e_machine;
+  // object file version
   uint32_t        e_version;
+  // virtual address to starting the process
   uint64_t        e_entry;
+  // program header table's offset in bytes
   uint64_t        e_phoff;
+  // section header table's offset in bytes
   uint64_t        e_shoff;
+  // processor-specific flags
   uint32_t        e_flags;
+  // ELF header's size in bytes
   uint16_t        e_ehsize;
+  // size in bytes of one entry in the program header table
   uint16_t        e_phentsize;
+  // number of entries in the program header table
   uint16_t        e_phnum;
+  // size in bytes of one entry in the section header table
   uint16_t        e_shentsize;
+  // number of entries in the section header table
   uint16_t        e_shnum;
+  // section nam string table's index in the section header table
   uint16_t        e_shstrndx;
 } Elf_Internal_Ehdr;
 

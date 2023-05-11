@@ -1,16 +1,28 @@
 #ifndef ELF_IDENT_H
 #define ELF_IDENT_H
 
+// always 0x7f
 #define EI_MAG0       0
+// always 0x45 ('E')
 #define EI_MAG1       1
+// always 0x4c ('L')
 #define EI_MAG2       2
+// always 0x46 ('F')
 #define EI_MAG3       3
+// file's class, or capacity.
+// 0: invalid
+// 1: 32-bits
+// 2: 64-bits
 #define EI_CLASS      4
+// data encoding of the processor-specific data
 #define EI_DATA       5
+// ELF header version number
 #define EI_VERSION    6
 #define EI_OSABI      7
 #define EI_ABIVERSION 8
+// unused bytes in the ELF identification
 #define EI_PAD        9
+
 #define EI_NIDENT     16
 
 #define ELFMAG0 0x7f
